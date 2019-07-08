@@ -1,0 +1,138 @@
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+  </head>
+  <body>
+    <div ng-app="Project">
+      <div ng-controller="productionSequence">
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-2">
+              <div style="width: 180px; height: 140px;">
+                <img style="width: 180px; height: 70px;" alt="TARDY logo" src="./images/tardy-logo.jpg">
+                <img style="width: 180px; height: 70px;" alt="APR logo" src="./images/APR-QD.jpg">
+              </div>
+            </div>
+            <div class="col-lg-8" style="text-align: center">
+              <h1><big><big>Production sequence creator</big></big></h1>
+              <img alt="H2020_head" src="./images/horizon2020.jpg">
+            </div>
+            <div class="col-lg-2">
+              <div class="row">
+                <div class="col-lg-12">
+                  <a href="UserPage.html?{{User}}">{{User}}
+                    <img alt="user" src="./images/user.jpg" style="width: 50px; height: 50px;"></a>
+                  </div>
+                  <div class="col-lg-12">
+                    <img alt="message" src="./images/message.jpg" style="width: 50px; height: 50px;">
+                    <a href="Accueil.html"><img alt="home" src="./images/home.jpg" style="width: 50px; height: 50px;"></a>
+                    <img alt="logout" src="./images/signout.jpg" style="width: 50px; height: 50px;">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p><big><big></big></big></p>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-2" style="border: 2px solid black; border-radius: 6px;"> 
+                <legend> Menu </legend>
+                <div class="row">
+                  <div><a id="back" href="">
+                    <div class="col-lg-12">
+                      <img style="width: 40px; height: 40px;" alt="Add" src="./images/history.jpg">
+                      <big>Back</big>
+                    </div>
+                  </a></div>
+                  <div><a id="decision" href="">
+                    <div class="col-lg-12">
+                      <img style="width: 40px; height: 40px;" alt="Add" src="./images/decision.jpg">
+                      <big>Accept/Reject</big>
+                    </div>
+                  </a></div>
+                </div>
+              </div>  
+              <div class="col-lg-9">
+                <div class="row">
+                  <div class="col-lg-12">
+                    <div>
+                      <input type="hidden" ng-model="num">
+                    </div>
+                    <div>
+                      <label>Features</label>
+                      <select ng-model="features">
+                        <option ng-repeat="x in labelFeatures">{{x.label}}</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>Label</label>
+                      <input type="text" ng-model="label">
+                    </div>
+                    <div>
+                      <label>Date</label>
+                      <input type="Date" ng-model="date">
+                    </div>
+                    <div>
+                      <label>Type</label>
+                      <input type="text" ng-model="type">
+                    </div>
+                    <div>
+                      <label>Attribution</label>
+                      <select ng-model="attribution">
+                        <option value="APR">APR</option>
+                        <option value="TARDY">TARDY</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label>Dependancies</label>
+                      <input type="text" ng-model="dep">
+                    </div>
+                    <div>
+                      <label>Comments</label>
+                      <input type="text" ng-model="comments">
+                    </div>
+                    <button id="lines" ng-click="postNewLine()">Add sequence</button>
+                    <p>
+                      <button id="update" ng-click="updateLine()" style="display:none">Update sequence</button>
+                      <button id="cancel" ng-click="cancelUpdate()" style="display:none">Cancel</button></p>
+                    </div>
+                    <div class="col-lg-12">
+                      <table style="">
+                       <tbody style="text-align: center;">
+                        <tr style="font-weight: bold; font-size: 15pt">
+                         <td>Num</td><td>Features</td><td>Label</td><td>Date</td><td>Type</td><td>Attribution</td><td>Dependancies</td><td>Comments</td>
+                       </tr>
+                       <tr ng-repeat="x in productionInformation">
+                         <td>{{x.num}}</td>
+                         <td>{{x.features}}</td>
+                         <td>{{x.label}}</td>
+                         <td>{{x.date}}</td>
+                         <td>{{x.type}}</td>
+                         <td>{{x.attribution}}</td>
+                         <td>{{x.dependancies}}</td>
+                         <td>{{x.comments}}</td>
+                         <td><button ng-click="deleteOperation(x.num)">Delete</button></td>
+                         <td><button ng-click="updateOperation($index)">Update</button></td>
+                         <td><button ng-click="upOperation($index)">Up</button></td>
+                         <td><button ng-click="downOperation($index)">Down</button></td>
+                       </tr>
+                     </tbody>
+                   </table>
+                   <button ng-click='generateJsonFile()'>generate file</button>
+                 </div>
+               </div>
+             </div>
+           </div>
+           <div class="col-lg-12" style="text-align: right;">
+            Powered by <img alt="Vf-os" src="./images/vfos-logo-232x85.jpg" style="width: 100px; height: 36px;">
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./controller/Project.js"></script>
+    <script src="./controller/productionSequence.controller.js"> </script>
+  </body>
+  </html>
