@@ -4,6 +4,7 @@ app.controller('DisplayProject', function($scope, $http, config) {
 
   var project = getProject();
   document.getElementById("addNewFeature").href="NewFeatures.html?" + project;
+  document.getElementById("hrefOrder").href="Order.html?"+project
   $http.get('http://'+url+':'+port+'/getProject/' + project).then(function(response) {
     console.log(response.data)
     $scope.project_reference = response.data.project.project_name;

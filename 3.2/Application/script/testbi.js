@@ -120,18 +120,20 @@ function processMasteryDegree(refArticle, quantity, price, callback){
 
 function confidenceCoefficient(refArticle, quantity, price, callback){
   var query = "SELECT DISTINCT A.codart, A.libar1, O.ideofs, O.qtepre FROM artgen A join ofsgen O on A.ideart=O.ideart join ofsope OP on O.ideofs=OP.ideofs where codart='"+refArticle+"'"
-  getDataAPR(query, function(result){
-    if(result.length>0){
-      knowarticle(result, quantity, function(coeff){
-        processMasteryDegree(refArticle, quantity, price, function(degree, rebus, margeProd){
-          callback(coeff, degree, rebus, margeProd)
+  return new Promise(resolve => {
+    getDataAPR(query, function(result){
+      if(result.length>0){
+        knowarticle(result, quantity, function(coeff){
+          processMasteryDegree(refArticle, quantity, price, function(degree, rebus, costProd){
+            resolve([coeff, degree, rebus, costProd]);
+          })
         })
-      })
-    } else {
-      unknowarticle(refArticle, quantity, function(coeff){
-        callback(coeff,"", "", "");
-      })
-    }
+      } else {
+        unknowarticle(refArticle, quantity, function(coeff){
+          resolve([coeff,"", "", ""]);
+        })
+      }
+    })
   })
 }
 
@@ -227,11 +229,24 @@ function unknowarticle(refArticle, quantity, callback){
   }
 }
 
+
+async function test(refArticle, quantity, price){
+  console.log('calling');
+  var res = await confidenceCoefficient("F363956001", 175, 10000);
+  console.log(res)
+  /*console.log('###########################"');
+  console.log('condient coefficient: '+coeff + '%');
+  console.log('process mastery degree: '+ degree + '%');
+  console.log('rebus part: '+rebus+'%');
+  console.log('production marge: '+margeProd+'€');*/
+}
 //confidenceCoefficient("CUVE EPAISSEUR 12 MM", 175, "", function(coeff, degree){
-confidenceCoefficient("F363956001", 175, 10000, function(coeff, degree, rebus, margeProd){
+/*confidenceCoefficient("F363956001", 175, 10000, function(coeff, degree, rebus, margeProd){
   console.log('###########################"');
   console.log('condient coefficient: '+coeff + '%');
   console.log('process mastery degree: '+ degree + '%');
   console.log('rebus part: '+rebus+'%');
   console.log('production marge: '+margeProd+'€');
-});
+});*/
+
+test("F363956001", 175, 10000);

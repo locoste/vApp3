@@ -2,6 +2,10 @@ const sql = require('mssql');
 let mysql = require('mysql');
 var fs = require("fs");
 var dateformat = require('dateformat');
+var http = require('http');
+
+const odbc_url = process.env.ODBC_URL; 
+const odbc_port = process.env.ODBC_PORT;
 
 const default_user = 'Test_3';
 const default_password = 'aqwzsxedc';
@@ -21,6 +25,7 @@ var config =
 };
 
 if (con == undefined){
+
   con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
@@ -54,6 +59,37 @@ function getDataTARDY(request, callback){
     }
     callback(result);
   });
+}
+
+function odbcConnector(request, callback){
+      try {
+        const id = {
+          host : odbc_url,
+          path: '/api/odbcModels/requestdb?request='+escape(request),
+          port: odbc_port,
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        };  
+
+        const idCallback = function(response) {
+          let str = '';
+          response.on('data', function(chunk) {
+            str += chunk;
+          });
+
+          response.on('end', function(){
+            var result = JSON.parse(str)
+            callback(result.request);
+          })
+        }
+
+        const idReq = http.request(id, idCallback);
+        idReq.end();
+      } catch(e){
+        console.log(e)
+      }
 }
 
 function processMasteryDegree(refArticle, quantity, price, callback){
@@ -112,8 +148,8 @@ function processMasteryDegree(refArticle, quantity, price, callback){
       }
       degreemasteryprocess = tpGammeProdTheoCmde/tpgammeTheoCmde*coeffrebus*100+100;
       coutTheoProdCmde = ofsResult[0].prevth*quantity;
-      margeProduction = price-coutTheoProdCmde;
-      callback(degreemasteryprocess, rebusTot*100, margeProduction);
+      margeProduction = coutTheoProdCmde;
+      callback(degreemasteryprocess, rebusTot*100, coutTheoProdCmde);
     })
   })
 }
@@ -123,8 +159,8 @@ function confidenceCoefficient(refArticle, quantity, price, callback){
   getDataAPR(query, function(result){
     if(result.length>0){
       knowarticle(result, quantity, function(coeff){
-        processMasteryDegree(refArticle, quantity, price, function(degree, rebus, margeProd){
-          callback(coeff, degree, rebus, margeProd)
+        processMasteryDegree(refArticle, quantity, price, function(degree, rebus, costProd){
+          callback(Math.round(coeff*100)/100, Math.round(degree*100)/100, Math.round(rebus*100)/100, Math.round(costProd*100)/100)
         })
       })
     } else {
@@ -225,4 +261,45 @@ function unknowarticle(refArticle, quantity, callback){
   } catch(err) {
     console.log(err);
   }
+}
+
+exports.analyseArticles = function(project, callback){
+  try {
+    var resultDataAnalysis = [];
+  var compt=0;
+  var query = "select project_name, feature_id, part_reference, Q.quantity_id, Q.quantity from project P join features F on P.project_id = F.project join product_quantity Q on P.project_id=Q.project where project_name = '"+project+"'";
+  var queryanalysis = "SELECT * FROM feature_analysis"
+  odbcConnector(query, function(result){
+    odbcConnector(queryanalysis, function(resultAnalysis){
+      for(const line of result){
+        var done=false;
+        for(const item of resultAnalysis){
+          if(line.part_reference==item.part_reference && line.quantity==item.quantity){
+            resultDataAnalysis.push({feature_id:item.feature, feature:item.part_reference, quantity:item.quantity, coefficient: item.coefficient, masteryDegree: item.mastery_degree, rebus: item.rebus, costProd: item.cost_production });
+            done=true;
+            console.log('1')
+            if(resultDataAnalysis.length==result.length){
+              callback({project:project, features:resultDataAnalysis})
+            }
+            break;
+          }
+        }
+        if(done==false){
+          confidenceCoefficient(line.part_reference, line.quantity, 0, function(coeff, degree, rebus, costProd){
+            resultDataAnalysis.push({feature_id:line.feature_id, feature:line.part_reference, quantity:line.quantity, coefficient: coeff, masteryDegree: degree, rebus: rebus, costProd: costProd });
+            var queryInsert = "INSERT INTO feature_analysis(feature, quantity, coefficient, mastery_degree, rebus, cost_production, part_reference) VALUES ("+line.feature_id+","+line.quantity+","+coeff+", "+degree+", "+rebus+", "+costProd+", '"+line.part_reference+"')"
+            odbcConnector(queryInsert, function(response){console.log('insert with success')});
+            console.log('comparaison compt: '+resultDataAnalysis.length+' / '+result.length)
+            if(resultDataAnalysis.length==result.length){
+              callback({project:project, features:resultDataAnalysis})
+            }
+          })
+        }
+      }
+    })
+  })
+} catch (e){
+  console.log(e);
+  callback({project:project, features:null})
+}
 }

@@ -158,5 +158,5 @@ module.exports = function(app) {
     app.get('/getFileId/:file/:feature', contSession.authrequired, controller.getFileId);
 
     // get bi data
-    app.get('/getproductDataAnalysis/:product/:quantity/:price', contSession.authrequired, controller.getproductDataAnalysis);
+    app.get('/getproductDataAnalysis/:project', controller.getproductDataAnalysis);
 }

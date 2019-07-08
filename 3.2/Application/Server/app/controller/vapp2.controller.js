@@ -5,6 +5,36 @@ const https = require('https');
 var http = require('http');
 var fs = require('fs');
 var FormData = require('form-data');
+const sql = require('mssql');
+let mysql = require('mysql');
+var nodemailer = require('nodemailer');
+
+const default_user = 'Test_3';
+const default_password = 'aqwzsxedc';
+const default_server = 'localhost';
+const default_database = 'Lxp';
+
+const rebusMax = 1;
+
+var con;
+
+var config = 
+{
+ user: default_user, // update me
+ password: default_password, // update me
+ server: default_server, // update me
+ database:default_database
+};
+
+if (con == undefined){
+  con = mysql.createConnection({
+    host: 'localhost',
+    user: 'root',
+    password: 'Lamoule07130',
+    database: 'tardy_scheduler'
+  });
+}
+
 const alf_url = process.env.ALF_URL;
 const alf_port = process.env.ALF_PORT;
 const scan_url = process.env.SCAN_URL;
@@ -19,18 +49,18 @@ exports.displayPage = function(req, res) {
   console.log('displayPage');
   res.writeHead(200, {"Content-Type": "text/html"});
   fs.readFile('../View/'+page, function(err, html){
-      if(err){
-        throw err;
-      }
-      res.write(html);
-      res.end();
-    })
+    if(err){
+      throw err;
+    }
+    res.write(html);
+    res.end();
+  })
 }
 
 exports.redirecting = function(req, res) {
-    console.log('go Home page');
-    res.redirect('/Vapp2/Accueil.html');
-  }
+  console.log('go Home page');
+  res.redirect('/Vapp2/Accueil.html');
+}
 
 exports.displayLoginPage = function(req, res) {
   var page = req.params.page;
@@ -39,12 +69,12 @@ exports.displayLoginPage = function(req, res) {
   console.log(req.sessionID)*/
   res.writeHead(200, {"Content-Type": "text/html"});
   fs.readFile('../View/login.html', function(err, html){
-      if(err){
-        throw err;
-      }
-      res.write(html);
-      res.end();
-    })
+    if(err){
+      throw err;
+    }
+    res.write(html);
+    res.end();
+  })
 }
 
 exports.favicon = function(req, res){
@@ -65,24 +95,24 @@ exports.createUserPage = function(req, res) {
   console.log(req.sessionID)*/
   res.writeHead(200, {"Content-Type": "text/html"});
   fs.readFile('../View/CreateUser.html', function(err, html){
-      if(err){
-        throw err;
-      }
-      res.write(html);
-      res.end();
-    })
+    if(err){
+      throw err;
+    }
+    res.write(html);
+    res.end();
+  })
 }
 
 exports.get3DScript = function(req, res) {
   var script = req.params.script;
   res.writeHead(200, {"Content-Type": "text/plain"});
   fs.readFile('../js/'+script, function(err, js){
-      if(err){
-        throw err;
-      }
-      res.write(js);
-      res.end();
-    })
+    if(err){
+      throw err;
+    }
+    res.write(js);
+    res.end();
+  })
 }
 
 exports.getController = function(req, res) {
@@ -123,18 +153,18 @@ exports.displayImages = function(req, res) {
 exports.findAllProject = function(req, res) {
   var user = req.user.id;
   var query = 'SELECT project_name, project_description, C.company, C.contact, C.email FROM Project P join Customer C on P.customer = C.customer_id '
-	odbcConnector(query, function(result){
-      res.send(result)
-});
+  odbcConnector(query, function(result){
+    res.send(result)
+  });
 }
 
 exports.getFeaturesForProject = function(req, res) {
 	var project = req.params.project;
 	query = 'select * FROM features F JOIN product P on F.feature_id=P.features JOIN project PR on P.project=PR.project_id WHERE project_name = "' + project +'";'
 	odbcConnector(query, function(result) {
-      res.write(JSON.stringify(result));
-      res.end();
-	})
+    res.write(JSON.stringify(result));
+    res.end();
+  })
 }
 
 exports.getFeatures = function(req, res) {
@@ -142,29 +172,29 @@ exports.getFeatures = function(req, res) {
   query = 'select * from features where feature_id = '+ features
   console.log(query);
   odbcConnector(query, function(result) {
-      res.write(JSON.stringify(result));
-      res.end();
+    res.write(JSON.stringify(result));
+    res.end();
   })
 }
 
 exports.getProjectInformation = function(req, res) {
 	var project = req.params.project;
 	query = 'SELECT project_id, project_name, project_description,internal_reference, status, company, contact, email, phone_number, expected_delivery '
-				+ 'FROM Project P join Customer C on P.customer = C.customer_id WHERE project_name = "'+ project +'"';
-	odbcConnector(query, function(result) {
-		row = '{"project":{ "project_id":"' + result[0].project_id + '", '
-		row = row + '"project_name": "' + result[0].project_name + '", '
-		row = row + '"project_description": "' + result[0].project_description + '", '
+  + 'FROM Project P join Customer C on P.customer = C.customer_id WHERE project_name = "'+ project +'"';
+  odbcConnector(query, function(result) {
+    row = '{"project":{ "project_id":"' + result[0].project_id + '", '
+    row = row + '"project_name": "' + result[0].project_name + '", '
+    row = row + '"project_description": "' + result[0].project_description + '", '
     row = row + '"internal_reference": "' + result[0].internal_reference + '", '
     row = row + '"expected_delivery": "' + dateFormat(result[0].expected_delivery, "isoDate") + '", '
-		row = row + '"customer": {"company": "' + result[0].company + '", '
-		row = row + '"contact": "' + result[0].contact + '", '
-		row = row + '"email": "' + result[0].email + '", '
-		row = row + '"phone_number": "' + result[0].phone_number + '"}}}'
-		
-		res.write(row);
-		res.end();
-	})
+    row = row + '"customer": {"company": "' + result[0].company + '", '
+    row = row + '"contact": "' + result[0].contact + '", '
+    row = row + '"email": "' + result[0].email + '", '
+    row = row + '"phone_number": "' + result[0].phone_number + '"}}}'
+
+    res.write(row);
+    res.end();
+  })
 }
 
 exports.getCompanies = function (req, res) {
@@ -222,8 +252,8 @@ exports.newFeatures = function(req, res) {
   var creation_date = dateFormat(Date.now(), "isoDate");
 
   query = 'INSERT INTO features (label, attribution, component, compound, ratio, material, heat_treatment, surface_treatment, width, lenght, height, volume, manufacturing, tolerance, rugosity, comments, part_reference, creation_date, feature_status)'
-   + 'VALUES ("'+ features.label +'","'+ features.attribution +'","' + features.component+'", "' + features.compound+'", "' + features.ratio+'","' + features.material+'", "' + features.heat_treatment+'", "' + features.surface_treatment+'", "' + features.width +'", "' + features.lenght+'", "' + features.height+'", "' + features.volume+'", "' + features.manufacturing+'", "' + features.tolerance+'", "' + features.rugosity+'", "' + features.comments+'", "' + features.part_reference+'", "' + creation_date+'","Submitted");';
-   odbcConnector(query, function(){});
+  + 'VALUES ("'+ features.label +'","'+ features.attribution +'","' + features.component+'", "' + features.compound+'", "' + features.ratio+'","' + features.material+'", "' + features.heat_treatment+'", "' + features.surface_treatment+'", "' + features.width +'", "' + features.lenght+'", "' + features.height+'", "' + features.volume+'", "' + features.manufacturing+'", "' + features.tolerance+'", "' + features.rugosity+'", "' + features.comments+'", "' + features.part_reference+'", "' + creation_date+'","Submitted");';
+  odbcConnector(query, function(){});
   
   query = 'INSERT INTO product(product_name, is_metal, is_plastic, features, project) VALUES ("'+features.product_name+'",'+features.metal+','+features.plastic+',(SELECT max(feature_id) FROM features),(SELECT project_id FROM project WHERE project_name="'+project+'"));'
   odbcConnector(query, function(){
@@ -269,18 +299,17 @@ exports.getProductInformation = function(req, res) {
   })
 }
 
-exports.getQuantities = function(req, res)
-{
+exports.getQuantities = function(req, res){
   var project = req.params.project;
   var row = '{"quantities":[ ';
   query = 'SELECT quantity_id, Q.quantity , lot_size, number_of_lot, default_label FROM product_quantity Q join project P on Q.project = P.project_id WHERE project_name = "' + project + '";'
   odbcConnector(query, function(result){
     for (var i = 0; i < result.length; i++) {
-        row = row + '{"quantity_id":"' + result[i].quantity_id + '",'
-        row = row + '"quantity": "' + result[i].quantity + '",'
-        row = row + '"lot_size":"' + result[i].lot_size + '",'
-        row = row + '"number_of_lot":"' + result[i].number_of_lot + '",'
-        row = row + '"default_label":"' + result[i].default_label + '"},'
+      row = row + '{"quantity_id":"' + result[i].quantity_id + '",'
+      row = row + '"quantity": "' + result[i].quantity + '",'
+      row = row + '"lot_size":"' + result[i].lot_size + '",'
+      row = row + '"number_of_lot":"' + result[i].number_of_lot + '",'
+      row = row + '"default_label":"' + result[i].default_label + '"},'
         //console.log(row);
       }
       row = row.substr(0,row.length - 1);
@@ -288,7 +317,7 @@ exports.getQuantities = function(req, res)
 
       res.write(row);
       res.end();
-  })
+    })
 }
 
 exports.newQuantity = function(req, res){
@@ -416,13 +445,14 @@ exports.getFiles = function(req, res){
 }
 
 exports.getproductDataAnalysis = function(req, res){
-  var product = req.params.product;
-  var quantity = req.params.quantity;
-  var price = req.params.price;
-  scriptFile.confidenceCoefficient(product, quantity, price, function(coeff, degree, rebus, margeProd){
-    var result = {coefficient: coefficient, masteryDegree: degree, rebus: rebus, productionMarge: margeProd};
+ try {
+  var project = req.params.project;
+  scriptFile.analyseArticles(project, function(result){
     res.send(result);
   })
+} catch (err) {
+  console.error(err)
+}
 }
 
 exports.getTicket = function (req, res){
@@ -454,7 +484,7 @@ exports.getTicket = function (req, res){
       res.send(ticket);
     });
 
-    
+
   }
   const logReq = http.request(initLogin, loginCallback);
   logReq.write(bodyLogin);
@@ -472,31 +502,68 @@ exports.getFileId = function(req, res){
 
 function odbcConnector(request, callback){
   try {
-  const id = {
-        host : odbc_url,
-        path: '/api/odbcModels/requestdb?request='+escape(request),
-        port: odbc_port,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };  
-
-      const idCallback = function(response) {
-        let str = '';
-        response.on('data', function(chunk) {
-          str += chunk;
-        });
-
-        response.on('end', function(){
-          var result = JSON.parse(str)
-          callback(result.request);
-        })
+    const id = {
+      host : odbc_url,
+      path: '/api/odbcModels/requestdb?request='+escape(request),
+      port: odbc_port,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
+    };  
 
-      const idReq = http.request(id, idCallback);
-      idReq.end();
-    } catch(e){
-      console.log(e)
+    const idCallback = function(response) {
+      let str = '';
+      response.on('data', function(chunk) {
+        str += chunk;
+      });
+
+      response.on('end', function(){
+        var result = JSON.parse(str)
+        callback(result.request);
+      })
     }
+
+    const idReq = http.request(id, idCallback);
+    idReq.end();
+  } catch(e){
+    console.log(e)
+  }
+}
+
+function sendEmail(object, text){
+  var transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
+    requireTLS: true,
+    auth: {
+      user: 'louis.coste69@gmail.com',
+      pass: 'Lamoule07130'
+    },
+    tls: {
+      rejectUnauthorized: false
+    }
+  });
+
+  var mailOptions = {
+    from: 'louis.coste69@gmail.com',
+    to: apr_mail+', '+tardy_mail,
+    subject: object,
+    text: text
+  };
+
+  console.log('transporter:')
+  console.log(transporter);
+  console.log('mailOptions: ')
+  console.log( mailOptions);
+
+  transporter.sendMail(mailOptions, function(error, info){
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+    transporter.close();
+  });
 }
