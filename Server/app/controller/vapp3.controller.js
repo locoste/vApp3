@@ -105,6 +105,63 @@ exports.getController = function(req, res) {
   }
 }
 
+exports.getTreantFile = function(req, res){
+  var page = req.params.page;
+  var path = '';
+  switch(page){
+    case 'app.js':
+      path = page;
+      break;
+    case 'Treant.css':
+      path = 'treant-js/'+page;
+      break;
+    case 'conn.css':
+      path = page;
+      break;
+    case 'controller.js':
+      path = page;
+      break;
+    case 'raphael.js':
+      path = 'treant-js/vendor/'+page;
+      break;
+    case 'Treant.js':
+      path = 'treant-js/'+page;
+      break;
+  }
+  res.writeHead(200, {"Content-Type": "text/plain"});
+  fs.readFile('./app/tree/'+path, function(err, js){
+      if(err){
+        throw err;
+      }
+      res.write(js);
+      res.end();
+    })
+}
+
+exports.getTreantVendorFile = function(req, res){
+  var page = req.params.page;
+  res.writeHead(200, {"Content-Type": "text/plain"});
+  fs.readFile('./app/treant-js-master/vendor/'+page, function(err, js){
+      if(err){
+        throw err;
+      }
+      res.write(js);
+      res.end();
+    })
+}
+
+exports.getTreantCssFile = function(req, res){
+  var page = req.params.page;
+  res.writeHead(200, {"Content-Type": "text/css"});
+  fs.readFile('./app/treant-js-master/'+page, function(err, js){
+      if(err){
+        throw err;
+      }
+      res.write(js);
+      res.end();
+    })
+}
+
 exports.displayImages = function(req, res) {
   var image = req.params.image;
   res.writeHead(200, {"Content-Type": "image/jpg"});
@@ -117,9 +174,9 @@ exports.displayImages = function(req, res) {
   })
 } 
 
-exports.findAllProject = function(req, res) {
+exports.findAllOrder = function(req, res) {
   var user = req.user.id;
-  var query = 'SELECT project_name, project_description, C.company, C.contact, C.email FROM Project P join Customer C on P.customer = C.customer_id WHERE customer_id='+user
+  var query = 'SELECT * FROM product_sequence WHERE pere is null'
   odbcConnector(query, function(result){
     console.log(result)
     res.send(result)
@@ -128,8 +185,7 @@ exports.findAllProject = function(req, res) {
 
 exports.getProjectInformation = function(req, res) {
 	var project = req.params.project;
-	query = 'SELECT project_id, project_name, project_description,internal_reference, status, company, contact, email, phone_number, expected_delivery '
-  + 'FROM Project P join Customer C on P.customer = C.customer_id WHERE project_name = "'+ project +'"';
+	query = 'SELECT product, quantity, manufacturer , delivery_date FROM product_sequence WHERE pere is null AND groupe = "'+ project +'"';
   odbcConnector(query, function(result){
     console.log(result)
     res.send(result)
@@ -170,209 +226,37 @@ exports.getCustomerInformation = function(req, res) {
   })
 }
 
-exports.updateProject=  function (req, res) {
-  var projectid = req.params.project;
-  var project = req.body.project;
-
-  query = 'UPDATE project SET project_name = "' + project.project_name + '",internal_reference = "' + project.internal_reference + '",project_description = "' + project.project_description + '", customer = (SELECT customer_id FROM customer WHERE company = "' + project.customer + '" LIMIT 1) WHERE project_name = "'+ projectid +'";';
-  odbcConnector(query, function(result){
-    console.log(result)
-    res.send(result)
-  })
-}
-
-exports.getProductInformation = function(req, res) {
-  var feature = req.params.feature;
-  var row = '{ "project" : "';
-  query = 'SELECT project_name FROM project P join features F on P.project_id=F.project WHERE feature_id = ' + feature
-  odbcConnector(query, function(result){
-    row += result[0].project_name + '",'
-  })
-  query = 'SELECT product_name, is_metal, is_plastic FROM product P JOIN features F on P.features=F.feature_id WHERE feature_id = ' + feature
-  odbcConnector(query, function(result){
-    row += '"product": { "product_name": "'+ result[0].project_name + '",'
-    row += '"metal": "' + result[0].is_metal +'", ' + '"plastic": "' + result[0].is_plastic + '"}}'
-    res.write(row);
-    res.end();
-  })
-}
-
-exports.getQuantities = function(req, res)
-{
-  var project = req.params.project;
-  query = 'SELECT quantity_id, Q.quantity , lot_size, number_of_lot, default_label FROM product_quantity Q join project P on Q.project = P.project_id WHERE project_name = "' + project + '";'
-  odbcConnector(query, function(result){
-    console.log(result)
-    res.send(result)
-  })
-}
-
-exports.projectSummary = function(req, res) {
-  var project = req.params.project;
-  var query = 'SELECT company, part_reference, label FROM project P JOIN customer C on P.customer=C.customer_id JOIN product PR on P.project_id = PR.project JOIN features F on PR.features = F.feature_id WHERE project_name = "' + project + '";'
-  odbcConnector(query, function(result){
-    var row = '{"project": {'
-    row += '"company": "' + result[0].company + '",'
-    row += '"features":['
-    for (i = 0; i < result.length; i++)
-    {
-      row += '{"part_reference": "' + result[i].part_reference + '",'
-      row += '"label": "' + result[i].label + '"},'
+exports.getJSONTree = function(req, res){
+  var product = req.params.product;
+  var query = 'select * from product_sequence where groupe = '+product+' order by pere';
+  odbcConnector(query, function(tab){
+    console.log(tab)
+    var json = {prod:tab[0].id,text:{name:tab[0].product}, children:[]};
+    curpere = tab[0].id
+    var curjson=json;
+    for(i=1;i<tab.length;i++){
+      console.log(json)
+      if(tab[i].pere==curpere){
+        curjson['children'].push({prod:tab[i].id,text:{name:tab[i].product}, children:[]})
+      } else {
+        curpere = tab[i].pere
+        console.log(curjson['children'])
+        for(j=0;curjson['children'].length-1;j++){
+          console.log(curjson['children'][j])
+          if(curjson['children'][j].prod==curpere){
+            curjson = curjson['children'][j];
+            curjson['children'].push({prod:tab[i].id,text:{name:tab[i].product}, children:[]})
+            console.log(json)
+          }
+        }
+      }
     }
-    row = row.substr(0,row.length - 1);
-    row = row + ']}}'
-    res.write(row);
-    res.end();
-  })
-}
-
-exports.getProductSequence = function(req,res){
-  var project = req.params.project;
-  query = 'SELECT num, features, label, date_format(date, "%d/%m/%Y") as date, type, attribution, dependancies, comments FROM product_sequence WHERE project = (SELECT project_id FROM project WHERE project_name = "' + project + '") ORDER BY num;';
-  odbcConnector(query, function(result){
-    console.log(result)
+    console.log(JSON.stringify(json))
+    var result = '{"chart": {"container": "#example-graph"},"nodeStructure": '+JSON.stringify(json)+'}';
     res.send(result)
   })
 }
 
-exports.postSequenceLine = function(req, res){
-  var project = req.params.project;
-  var sequence = req.body;
-  query = 'SELECT max(num) as nbNum from product_sequence WHERE project=(SELECT project_id FROM project WHERE project_name = "' + project + '")'
-  odbcConnector(query, function(result){
-    if(result.length==0){
-      var num = 1
-    } else {
-      var num = result[0].nbNum+1;
-    }
-    query = 'INSERT INTO product_sequence (num, features, label, date, type, attribution, dependancies, comments, project) VALUES ('+num+',"'+sequence.features+'","'+sequence.label+'","'+dateFormat(sequence.date, "isoDate")+'","'+sequence.type+'","'+sequence.attribution+'",'+sequence.dependancies+',"'+sequence.comments+'", (SELECT project_id FROM project WHERE project_name = "'+project+'"))';
-    console.log(query);
-    odbcConnector(query, function(result){
-      res.end();
-    })
-  })
-}
-
-exports.getLabelFeatures = function(req, res) {
-  var project = req.params.project;
-  query = 'SELECT label FROM features F JOIN product P on F.feature_id=P.features JOIN project PR on P.project=PR.project_id WHERE project_name = "' + project +'";'
-  odbcConnector(query, function(result){
-    res.send(result)
-  })
-}
-
-exports.setSequenceDecision = function(req, res){
-  var project = req.params.project;
-  var decision = req.body;
-  query = 'UPDATE project SET sequence_decision = ' + decision.decision + ' WHERE project_name = "' + project + '";'
-  odbcConnector(query, function(result){
-    res.end()
-  })
-}
-
-exports.getSequenceDecision = function(req, res){
-  var project = req.params.project;
-  query = 'SELECT sequence_decision FROM project WHERE project_name = "' + project + '";'
-  odbcConnector(query, function(result){
-    res.send(result)
-  })
-}
-
-exports.deleteSequenceLine = function(req, res){
-  var line = req.params.num;
-  var project = req.params.project;
-  console.log(req.body)
-  query = 'DELETE FROM product_sequence WHERE num='+line+' AND project=(SELECT project_id FROM project WHERE project_name="'+project+'");'
-  odbcConnector(query, function(result){
-    query = 'UPDATE product_sequence SET dependancies=NULL WHERE dependancies='+line+' AND project=(SELECT project_id FROM project WHERE project_name="'+project+'")'
-    odbcConnector(query, function(result){
-      res.end()
-    })
-  })
-}
-
-exports.updateLine = function(req, res){
-  var project=req.params.project;
-  var line=req.body;
-  console.log('lol')
-  var query = 'UPDATE product_sequence SET features="'+line.features+'", label="'+line.label+'", date="'+dateFormat(line.date, "isoDate")+'", type="'+line.type+'", attribution="'+line.attribution+'", comments="'+line.comments+'", dependancies='+line.dep+' WHERE num='+line.num+' AND project=(SELECT project_id FROM project WHERE project_name="'+project+'")'
-  odbcConnector(query, function(result){
-    res.end()
-  })
-}
-
-exports.upProductionLine = function(req, res){
-  var project = req.params.project;
-  var line = req.body
-  var query = 'SELECT sequence_id FROM product_sequence WHERE num='+line.num+' AND project=(SELECT project_id FROM project WHERE project_name="'+project+'")'
-  console.log(query)
-  odbcConnector(query, function(result){
-    var query = 'SELECT sequence_id FROM product_sequence WHERE num='+line.num2+' AND project=(SELECT project_id FROM project WHERE project_name="'+project+'")'
-    console.log(query)
-    odbcConnector(query, function(result2){
-      var query = 'UPDATE product_sequence SET num='+line.num2+' WHERE sequence_id='+result[0].sequence_id;
-      console.log(query)
-      odbcConnector(query, function(something){
-        var query = 'UPDATE product_sequence SET num='+line.num+' WHERE sequence_id='+result2[0].sequence_id;
-        console.log(query)
-        odbcConnector(query, function(something2){
-          var query = 'SELECT sequence_id FROM product_sequence WHERE dependancies='+line.num
-          console.log(query)
-          odbcConnector(query, function(depResult){
-            var query = 'SELECT sequence_id FROM product_sequence WHERE dependancies='+line.num2
-            console.log(query)
-            odbcConnector(query, function(depResult2){
-              var query = 'UPDATE product_sequence SET dependancies='+line.num2+' WHERE sequence_id in ('
-              if(depResult.length>0){
-                for(i=0; i<depResult.length; i++){
-                  query += depResult[i].sequence_id +','
-                }
-                query=query.substr(0, query.length-1)
-                query += ')'
-              }
-              else {
-                query = "SELECT * FROM product_sequence"
-              }
-              console.log(query)
-              odbcConnector(query, function(){
-                var query = 'UPDATE product_sequence SET dependancies='+line.num+' WHERE sequence_id in ('
-                if(depResult2.length>0){
-                  for(i=0; i<depResult2.length; i++){
-                    query += depResult2[i].sequence_id +','
-                  }
-                  query=query.substr(0, query.length-1)
-                  query += ')'
-                } else {
-                  var query = "SELECT * FROM product_sequence"
-                }
-                console.log(query)
-                odbcConnector(query, function(){
-                  res.send('product line up')
-                })
-              })
-            })
-          })
-        })
-      })
-    })
-  })
-}
-
-exports.getDependancies = function(req, res){
-  var project = req.params.project;
-  var query = 'SELECT dependancies FROM product_sequence WHERE project = (SELECT project_id FROM project WHERE project_name="'+project+'")'
-  odbcConnector(query, function(result){
-    res.send(result)
-  })
-}
-
-exports.generateJSON = function(req, res){
-  var project = req.params.project;
-  var query = 'SELECT project_id FROM project WHERE project_name="'+project+'"'
-  odbcConnector(query, function(result){
-    generateProdJSON(result[0].project_id);
-  })
-}
 
 function odbcConnector(request, callback){
   const id = {
@@ -432,6 +316,37 @@ function schedulerConnector(art, datedem, qteDem, mo, company, callback){
       idReq.end();
 }
 
+function getDataTARDY(request, callback){
+  try{
+    console.log(request)
+    con.query(request, function (err, result, moreResultSets) {
+      if (err) 
+      {
+        console.log(err);
+        result = err;
+      }
+      callback(result);
+    });
+  } catch(err){
+    console.log(err)
+  }
+}
+
+function getDataAPR(request, callback){
+  try {
+    var pool = new sql.ConnectionPool(config);
+    pool.connect().then(result => {
+     var aResult = pool.request().query(request);
+     var res = Promise.resolve(aResult);
+     res.then(function(data){callback(data.recordset)});
+
+   });
+  }
+  catch (err){
+    callback(returnData(err));
+  }
+}
+
 function generateProdJSONOld(project){
   var query = "SELECT num, label, date, type, attribution, dependancies, comments FROM product_sequence WHERE project="+project+" ORDER BY dependancies"
   
@@ -488,3 +403,5 @@ function addNode(num, result){
   console.log(seq);
   return seq;
 }
+
+// https://fperucic.github.io/treant-js/

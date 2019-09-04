@@ -52,17 +52,18 @@
       </div>  
       <div class="col-lg-9">
         <table style="">
+          <thead style="text-align: center;">
+            <th type="hidden"></th><th>Product</th><th>Seller</th><th>Quantity</th><th>Delivery_date</th><th>Manufacturing Order</th>
+          </thead>
         	<tbody style="text-align: center;">
-        		<tr style="font-weight: bold; font-size: 15pt">
-        			<td>Project Name</td><td>Project Description</td><td>Company</td><td>Contact</td><td>Email</td>
-        		</tr>
         		<tr ng-repeat="x in projectInformation">
-        			<td>{{x.project_name}}</td>
-        			<td>{{x.project_description}}</td>
-        			<td>{{x.company}}</td>
-        			<td>{{x.contact}}</td>
-        			<td>{{x.email}}</td>
-              <td><button><a ng-href="DisplayProject.html?{{x.project_name}}">Project Detail</a></button></td>
+              <td type="hidden">{{x.groupe}}</td>
+        			<td>{{x.product}}</td>
+        			<td>{{x.manufacturer}}</td>
+        			<td>{{x.quantity}}</td>
+        			<td>{{x.delivery_date}}</td>
+        			<td>{{x.of}}</td>
+              <td><button><a ng-href="DisplayProject.html?{{x.groupe}}">Project Detail</a></button></td>
         		</tr>
         	</tbody>
         </table>

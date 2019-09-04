@@ -1,17 +1,19 @@
-app.controller('LoginController', function($scope, $http) {
-
+app.controller('LoginController', function($scope, $http, config) {
+  const url = config.api_url;
+  const port = config.api_port;
+  
     $scope.logout = function(){
-    $http.post('http://localhost:3002/logout').then(function(response){console.log(response)})
+    $http.post('http://'+url+':'+port+'/logout').then(function(response){console.log(response)})
   }
 
     $scope.loginUser = function()
     {     
         body = '{"email": "'+$scope.login+'", "password":"'+$scope.password+'"}'
-        $http.post('http://localhost:3002/login', body).then(function(response){
+        $http.post('http://'+url+':'+port+'/login', body).then(function(response){
           console.log(response)
           $scope.login = "";
           $scope.password = "";
-          $http.get('http://localhost:3002/Vapp3/Accueil.html')
+          $http.get('http://'+url+':'+port+'/Vapp3/Accueil.html')
         });
     }
   });

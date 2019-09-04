@@ -1,15 +1,18 @@
-app.controller('AllProjectInformation', function($scope, $http) {
-    $http({method : "GET", url : 'http://localhost:3002/AllProjectInformation'}, {headers : {'Content-Type':'application/json'}}).then(function(response) {
+app.controller('AllProjectInformation', function($scope, $http, config) {
+  const url = config.api_url;
+  const port = config.api_port;
+  
+    $http.get('http://'+url+':'+port+'/AllOrderInformation').then(function(response) {
         console.log("response: ",response.data);
         $scope.projectInformation = response.data;
     });
 
-    $http.get('http://localhost:3002/getUserCompany').then(function(response){
+    $http.get('http://'+url+':'+port+'/getUserCompany').then(function(response){
       $scope.User = response.data[0].company;
     })
     
     $scope.logout = function(){
-    $http.post('http://localhost:3002/logout').then(function(response){
+    $http.post('http://'+url+':'+port+'/logout').then(function(response){
       console.log(response)})
   }
   

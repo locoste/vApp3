@@ -41,7 +41,7 @@ module.exports = function(app) {
       return uuid() // use UUIDs for session IDs
     },
     store: sessionStore,
-    secret: 'vfosvappone',
+    secret: 'vfosvappthree',
     resave: true,
     rolling:true,
     saveUninitialized: true,
@@ -63,7 +63,7 @@ module.exports = function(app) {
     // log out
     app.post('/logout', contSession.logoutUser);
 
-    // display all login controller
+    // get login controller
     app.get('/controller/:script', controller.getController);
 
     // get user company with id
@@ -81,6 +81,9 @@ module.exports = function(app) {
     // get 3D script 
     app.get('/Vapp3/js/:script', contSession.authrequired, controller.get3DScript);
 
+    // get treant files
+    app.get('/Vapp3/tree/:page', contSession.authrequired, controller.getTreantFile);
+
     // display all project page
     app.get('/Vapp3/controller/:script', contSession.authrequired, controller.getController);
 
@@ -90,57 +93,12 @@ module.exports = function(app) {
     // display all images
     app.get('/Vapp3/images/:image', contSession.authrequired, controller.displayImages);
 
-    // display all project
-    app.get('/AllProjectInformation', contSession.authrequired, controller.findAllProject);
+    // display all order
+    app.get('/AllOrderInformation', contSession.authrequired, controller.findAllOrder);
 
-    //get project information
+    // get JSON tree for display
+    app.get('/getJSONTree/:product', contSession.authrequired, controller.getJSONTree);
+
+    // get all project information
     app.get('/getProject/:project', contSession.authrequired, controller.getProjectInformation);
-
-    //get all companies
-    app.get('/getCompanies', contSession.authrequired, controller.getCompanies);
-
-    // get user information
-    app.get('/getUserInformation', contSession.authrequired, controller.getUserInformation);
-
-    //get customer information in function of a company
-    app.get('/getCompanyInformation', contSession.authrequired, controller.getCustomerInformation);
-
-    // get product and project information for features
-    app.get('/getProductInformation/:feature', contSession.authrequired, controller.getProductInformation);
-
-    // get all quantities for a project
-    app.get('/getQuantities/:project', contSession.authrequired, controller.getQuantities);
-
-    // get Project Summary for decision
-    app.get('/getProjectSummary/:project', contSession.authrequired, controller.projectSummary);
-
-    // get proudct sequence
-    app.get('/getProductSequence/:project', contSession.authrequired, controller.getProductSequence);
-
-    //post new production sequence line
-    app.post('/postSequenceLine/:project', contSession.authrequired, controller.postSequenceLine);
-
-    // get label features for a project
-    app.get('/getLabelFeatures/:project', contSession.authrequired, controller.getLabelFeatures);
-
-    // Set product sequence decision
-    app.put('/setSequenceDecision/:project', contSession.authrequired, controller.setSequenceDecision);
-
-    //get product sequence Decision
-    app.get('/getSequenceDecision/:project', contSession.authrequired, controller.getSequenceDecision);
-
-    // delete product sequence line
-    app.delete('/deleteSequenceLine/:num/:project', contSession.authrequired, controller.deleteSequenceLine);
-
-    // update production line
-    app.put('/updateLine/:project', contSession.authrequired, controller.updateLine);
-
-    // up productionline
-    app.put('/upProductionLine/:project', contSession.authrequired, controller.upProductionLine);
-
-    // get all dependancies for a project
-    app.get('/getDependancies/:project', contSession.authrequired, controller.getDependancies);
-
-    // generate json file of the prod sequence
-    app.post('/generateJSON/:project', contSession.authrequired, controller.generateJSON);
 }
