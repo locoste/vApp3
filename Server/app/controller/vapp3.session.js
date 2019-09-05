@@ -5,6 +5,7 @@ const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var request = require('../database/requestToDatabase.js')
+var http = require('http')
 
 passport.use(new LocalStrategy(
 	{ usernameField: 'email' },
