@@ -1,4 +1,3 @@
-var request = require('../database/requestToDatabase.js')
 var dateFormat = require('dateFormat');
 
 const https = require('https');
