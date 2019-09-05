@@ -1,3 +1,4 @@
+
 module.exports = function(app) {
 
     var controller = require('../controller/vapp3.controller.js');
@@ -72,6 +73,9 @@ module.exports = function(app) {
     // display all login page images
     app.get('/images/:image', controller.displayImages);
 
+    // get css files
+    app.get('/css/:file', controller.getCssFiles);
+
     // get favicon.ico
     app.get('/favicon.ico', controller.favicon)
 
@@ -102,3 +106,4 @@ module.exports = function(app) {
     // get all project information
     app.get('/getProject/:project', contSession.authrequired, controller.getProjectInformation);
 }
+
