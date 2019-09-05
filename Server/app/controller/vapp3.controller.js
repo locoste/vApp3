@@ -404,4 +404,17 @@ function addNode(num, result){
   return seq;
 }
 
+
+exports.getCssFiles = function(req, res){
+var file = req.params.file;
+res.writeHead(200, {"Content-Type": "text/css"});
+fs.readFile('./View/css/'+file, function(err, css){
+if(err){  
+ throw err;
+}
+ res.write(css);
+ res.end();   
+})
+}
+
 // https://fperucic.github.io/treant-js/
