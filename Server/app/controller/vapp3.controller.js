@@ -21,7 +21,7 @@ exports.displayPage = function(req, res) {
     }
   }
   res.writeHead(200, {"Content-Type": "text/html"});
-  fs.readFile('../View/'+page, function(err, html){
+  fs.readFile('./View/'+page, function(err, html){
     if(err){  
       throw err;
     }
@@ -38,7 +38,7 @@ exports.redirecting = function(req, res) {
 exports.displayLoginPage = function(req, res) {
   var page = req.params.page;
   res.writeHead(200, {"Content-Type": "text/html"});
-  fs.readFile('../View/login.html', function(err, html){
+  fs.readFile('./View/login.html', function(err, html){
     if(err){
       throw err;
     }
@@ -49,7 +49,7 @@ exports.displayLoginPage = function(req, res) {
 
 exports.favicon = function(req, res){
   res.writeHead(200, {"Content-Type": "image/png"});
-  fs.readFile('../images/favicon.png', function(err, image){
+  fs.readFile('./images/favicon.png', function(err, image){
     if(err){
       throw err;
     }
@@ -61,7 +61,7 @@ exports.favicon = function(req, res){
 exports.createUserPage = function(req, res) {
   var page = req.params.page;
   res.writeHead(200, {"Content-Type": "text/html"});
-  fs.readFile('../View/CreateUser.html', function(err, html){
+  fs.readFile('./View/CreateUser.html', function(err, html){
     if(err){
       throw err;
     }
@@ -73,7 +73,7 @@ exports.createUserPage = function(req, res) {
 exports.get3DScript = function(req, res) {
   var script = req.params.script;
   res.writeHead(200, {"Content-Type": "text/plain"});
-  fs.readFile('../js/'+script, function(err, js){
+  fs.readFile('./js/'+script, function(err, js){
     if(err){
       throw err;
     }
@@ -86,7 +86,7 @@ exports.getController = function(req, res) {
   var script = req.params.script;
   res.writeHead(200, {"Content-Type": "text/plain"});
   if (script == 'Project.js'){
-    fs.readFile('./app/'+script, function(err, js){
+    fs.readFile('./Server/app/'+script, function(err, js){
       if(err){
         throw err;
       }
@@ -95,7 +95,7 @@ exports.getController = function(req, res) {
     })
   }
   else {
-    fs.readFile('./app/controller/'+script, function(err, js){
+    fs.readFile('./Server/app/controller/'+script, function(err, js){
       if(err){
         throw err;
       }
@@ -129,7 +129,7 @@ exports.getTreantFile = function(req, res){
       break;
   }
   res.writeHead(200, {"Content-Type": "text/plain"});
-  fs.readFile('./app/tree/'+path, function(err, js){
+  fs.readFile('./Server/app/tree/'+path, function(err, js){
       if(err){
         throw err;
       }
@@ -141,7 +141,7 @@ exports.getTreantFile = function(req, res){
 exports.getTreantVendorFile = function(req, res){
   var page = req.params.page;
   res.writeHead(200, {"Content-Type": "text/plain"});
-  fs.readFile('./app/treant-js-master/vendor/'+page, function(err, js){
+  fs.readFile('./Server/app/treant-js-master/vendor/'+page, function(err, js){
       if(err){
         throw err;
       }
@@ -153,7 +153,7 @@ exports.getTreantVendorFile = function(req, res){
 exports.getTreantCssFile = function(req, res){
   var page = req.params.page;
   res.writeHead(200, {"Content-Type": "text/css"});
-  fs.readFile('./app/treant-js-master/'+page, function(err, js){
+  fs.readFile('./Server/app/treant-js-master/'+page, function(err, js){
       if(err){
         throw err;
       }
@@ -165,7 +165,7 @@ exports.getTreantCssFile = function(req, res){
 exports.displayImages = function(req, res) {
   var image = req.params.image;
   res.writeHead(200, {"Content-Type": "image/jpg"});
-  fs.readFile('../images/'+image, function(err, image){
+  fs.readFile('./images/'+image, function(err, image){
     if(err){
       throw err;
     }
@@ -252,7 +252,7 @@ exports.getJSONTree = function(req, res){
       }
     }
     console.log(JSON.stringify(json))
-    var result = '{"chart": {"container": "#example-graph"},"nodeStructure": '+JSON.stringify(json)+'}';
+    var result = '{"chart": {container: "#example-graph",levelSeparation: 45,rootOrientation: "WEST",nodeAlign: "BOTTOM",connectors: {type: "step",style: { "stroke-width": 2}},node: {HTMLclass: "big-commpany"},callback: {onClick: function (nodeId, node, event) {ctrl.selectEvent(nodeId, node, event);}.bind(this),onTreeLoaded: function () {console.log("Graph loaded!!");}}},"nodeStructure": '+JSON.stringify(json)+'}';
     res.send(result)
   })
 }

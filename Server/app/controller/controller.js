@@ -1,4 +1,4 @@
-app.controller("CustomController", function ($scope, $http) {
+app.controller("CustomController", function ($scope, $http, config) {
 	var ctrl = {};
 	var prod = getProject();
 
@@ -9,7 +9,12 @@ app.controller("CustomController", function ($scope, $http) {
 		$scope.$apply();
 	}
 
-	$scope.graph = {
+	$http.get('http://localhost:8002/getJSONTree/'+prod).then(function(response){
+		console.Log(response.data)
+		$scope.graph = response.data;
+	});
+
+	/*$scope.graph = {
 		chart: {
 			container: "#example-graph",
 			levelSeparation: 45,
@@ -38,7 +43,7 @@ app.controller("CustomController", function ($scope, $http) {
 			}
 		},
 
-		nodeStructure: /*{
+		nodeStructure: {
 			unique_name: "node1",
 			text: {
 				name: "CEO"
@@ -201,9 +206,10 @@ app.controller("CustomController", function ($scope, $http) {
 					}
 				}]
 			}]
-		}*/
+		}
 		{prod:2865,text:{name:"PAVE FLUIDIQUE INFERIEUR"},children:[{prod:2866,text:{name:"LEGO CLIP MT VERSION HAUT"},children:[{prod:2867,text:{name:"CAME"},children:[]}]},{prod:2868,text:{name:"LEGO CLIP MT VERSION HAUT"},children:[]}]}
-	};
+		
+		};*/
 
 	$scope.gotClick = function (temp) {
 		console.log("aa *****");
