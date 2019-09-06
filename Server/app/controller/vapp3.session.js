@@ -5,7 +5,10 @@ const FileStore = require('session-file-store')(session);
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var request = require('../database/requestToDatabase.js')
-var http = require('http')
+var http = require('http');
+
+const odbc_url = process.env.ODBC_URL; 
+const odbc_port = process.env.ODBC_PORT;
 
 passport.use(new LocalStrategy(
 	{ usernameField: 'email' },
