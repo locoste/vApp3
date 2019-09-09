@@ -183,8 +183,8 @@ exports.findAllOrder = function(req, res) {
 } 
 
 exports.getProjectInformation = function(req, res) {
-	var project = req.params.project;
-	query = 'SELECT product, quantity, manufacturer , delivery_date FROM product_sequence WHERE pere is null AND groupe = "'+ project +'"';
+  var project = req.params.project;
+  query = 'SELECT product, quantity, manufacturer , delivery_date FROM product_sequence WHERE pere is null AND groupe = "'+ project +'"';
   odbcConnector(query, function(result){
     console.log(result)
     res.send(result)
