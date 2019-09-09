@@ -3,6 +3,7 @@ module.exports = function(app) {
 
     var controller = require('../controller/vapp3.controller.js');
     var contSession = require('../controller/vapp3.session.js');
+    var script = require('../script/SchedulerAnalysisModel.js')
 
     var bodyParser = require('body-parser');
     const uuid = require('uuid/v4')
@@ -59,6 +60,8 @@ module.exports = function(app) {
 
     app.use(passport.initialize());
     app.use(passport.session());
+
+    setInterval(script.getTransfertVariable, 86400000);
 
     // redirecting 
     app.get('/', contSession.authrequired, contSession.redirecting);

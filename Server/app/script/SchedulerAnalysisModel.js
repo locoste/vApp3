@@ -65,32 +65,35 @@ function getDataTARDY(request, callback){
   }
 }
 
-function getTransfertVariable(){
+exports.getTransfertVariable = function(){
+  var oldquery = "UPDATE product_sequence SET age='old'"
   var getLinesFromAPR = "select * from cdeent where codcpt like 'TARDY%' or idecli = '71'";
   var getLinesFromTARDY = "select * from tardy_scheduler.tardydata where client like 'APR' and id_of=of_pere";
-  getDataAPR(getLinesFromAPR, function(resultAPR){
-    getDataTARDY(getLinesFromTARDY, function(resultTardy){
-      var taille = resultTardy.length+resultAPR.length
-      for(i=0; i<resultAPR.length; i++){
-        getFinalProduct(resultAPR[i].refcde,'APR', function(){
-          if(finalProduct.length==resultAPR.length){
-            for(j=0; j<resultTardy.length; j++){
-              getFinalProduct(resultTardy[j].ref_commande_du_client, 'TARDY', function(){
-                if(finalProduct.length==taille){
-                  console.log(finalProduct);
-                  for(m=0;m<finalProduct.length;m++){
-                    size+=finalProduct[m].length;
+  odbcConnector(oldquery, function(){
+    getDataAPR(getLinesFromAPR, function(resultAPR){
+      getDataTARDY(getLinesFromTARDY, function(resultTardy){
+        var taille = resultTardy.length+resultAPR.length
+        for(i=0; i<resultAPR.length; i++){
+          getFinalProduct(resultAPR[i].refcde,'APR', function(){
+            if(finalProduct.length==resultAPR.length){
+              for(j=0; j<resultTardy.length; j++){
+                getFinalProduct(resultTardy[j].ref_commande_du_client, 'TARDY', function(){
+                  if(finalProduct.length==taille){
+                    console.log(finalProduct);
+                    for(m=0;m<finalProduct.length;m++){
+                      size+=finalProduct[m].length;
+                    }
+                    console.log('size: '+size)
+                    setProductionSequence(function(){
+                      console.log('finished');
+                    });
                   }
-                  console.log('size: '+size)
-                  setProductionSequence(function(){
-                    console.log('finished');
-                  });
-                }
-              });
+                });
+              }
             }
-          }
-        })
-      }
+          })
+        }
+      })
     })
   })
 }
@@ -333,5 +336,3 @@ function lxpConnector(request, callback){
   const idReq = http.request(id, idCallback);
   idReq.end();
 }
-
-getTransfertVariable();

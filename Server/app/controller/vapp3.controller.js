@@ -14,11 +14,6 @@ exports.displayPage = function(req, res) {
       page='Unauthorized.html'    
     }
   }
-  if(page=='DisplayProject.html'){
-    if(req.user.role!='admin'){
-      page = 'DisplayProjectUser.html'
-    }
-  }
   res.writeHead(200, {"Content-Type": "text/html"});
   fs.readFile('./View/'+page, function(err, html){
     if(err){  
@@ -175,7 +170,7 @@ exports.displayImages = function(req, res) {
 
 exports.findAllOrder = function(req, res) {
   var user = req.user.id;
-  var query = 'SELECT * FROM product_sequence WHERE pere is null'
+  var query = 'SELECT * FROM product_sequence WHERE pere is null and age is null'
   odbcConnector(query, function(result){
     console.log(result)
     res.send(result)
