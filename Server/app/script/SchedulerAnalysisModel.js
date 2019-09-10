@@ -207,7 +207,7 @@ function setProductionSequence(callback){
               }
             })
           } else if(seller=='TARDY'){
-            console.log('TARDY')
+            console.log('TARDY');
             var queryTardy = "select * from product_sequence where pere="+data[0].id+" and manufacturer='APR'";
             odbcConnector(queryTardy, function(dataAPR){
               if(dataAPR.length>0){
