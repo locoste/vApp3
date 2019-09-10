@@ -119,6 +119,14 @@ exports.getTreantFile = function(req, res){
       path = page;
       res.writeHead(200, {"Content-Type": "text/plain"});
       break;
+    case 'jquery.min.js':
+      path = 'treant-js/vendor/'+page;
+      res.writeHead(200, {"Content-Type": "text/plain"});
+      break;
+    case 'jquery.easing.js':
+      path = 'treant-js/vendor/'+page;
+      res.writeHead(200, {"Content-Type": "text/plain"});
+      break;
     case 'raphael.js':
       path = 'treant-js/vendor/'+page;
       res.writeHead(200, {"Content-Type": "text/plain"});

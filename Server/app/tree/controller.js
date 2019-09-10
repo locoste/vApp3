@@ -2,7 +2,7 @@ app.controller("CustomController", function ($scope, $http) {
 	var ctrl = {};
 	var prod = getProject();
 
-	$scope.nodeSelectedLast = "(NONE)";
+	/*$scope.nodeSelectedLast = "(NONE)";*/
 
 	ctrl.selectEvent = function (nodeId, node, event) {
 		$scope.nodeSelectedLast = nodeId;
@@ -18,25 +18,24 @@ app.controller("CustomController", function ($scope, $http) {
 
 			//nodeAlign: "BOTTOM",
 
-			connectors: {
-				type: "step",
-				style: {
-					"stroke-width": 2
-				}
-			},
 			node: {
-				HTMLclass: "big-commpany"
+				HTMLclass: "big-commpany",
+				collapsable: true
+			},
+			animation: {
+				nodeAnimation: "easeOutBounce",
+				nodeSpeed: 700,
 			},
 			callback: {
         // This refers to custom callback available in https://github.com/Alexlambertz/treant-js
-				onClick: function (nodeId, node, event) {
-					ctrl.selectEvent(nodeId, node, event);
-				}.bind(this),
-				onTreeLoaded: function () {
-					console.log("Graph loaded!!");
-				}
-			}
-		},
+        onClick: function (nodeId, node, event) {
+        	ctrl.selectEvent(nodeId, node, event);
+        }.bind(this),
+        onTreeLoaded: function () {
+        	console.log("Graph loaded!!");
+        }
+    }
+},
 
 		nodeStructure: /*{
 			unique_name: "node1",
@@ -202,7 +201,9 @@ app.controller("CustomController", function ($scope, $http) {
 				}]
 			}]
 		}*/
-		{prod:2865,text:{name:"PAVE FLUIDIQUE INFERIEUR"},children:[{prod:2866,text:{name:"LEGO CLIP MT VERSION HAUT"},children:[{prod:2867,text:{name:"CAME"},children:[]}]},{prod:2868,text:{name:"LEGO CLIP MT VERSION HAUT"},children:[]}]}
+		{prod:2865,
+			text:
+			{name:"PAVE FLUIDIQUE INFERIEUR",title: "Begin:2019-03-13", desc:"End:2019-03-25", qty:"Quantity: 20"}, collapsed:true,children:[{prod:2866,text:{name:"LEGO CLIP MT VERSION HAUT", title:"THIS PRODUCT IS AWESOME!"},collapsed:true,children:[{prod:2867,text:{name:"CAME"},children:[]}]},{prod:2868,text:{name:"LEGO CLIP MT VERSION BAS"},children:[]}]}
 	};
 
 	$scope.gotClick = function (temp) {
@@ -211,10 +212,10 @@ app.controller("CustomController", function ($scope, $http) {
 	}
 
 	function getProject()
-  {
-    var str = window.location.search;
-    str = str.substr(1);
-    return str;
-  }
+	{
+		var str = window.location.search;
+		str = str.substr(1);
+		return str;
+	}
 
 });
