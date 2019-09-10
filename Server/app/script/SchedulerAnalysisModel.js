@@ -237,7 +237,7 @@ function setScheduleLineInDatabase(line, pere, groupe,callback){
   if(line.manufacturer != seller){
     productionTime += (new Date(line.endDate)-new Date(line.beginDate))/convertInDays
   }
-  var query = 'INSERT INTO product_sequence(product_id, product, manufacturer, begin_date, end_date, quantity, of, delivery_date, pere, groupe) VALUES '
+  var query = 'INSERT INTO product_sequence(product_id, product, manufacturer, begin_date, end_date, quantity, `of`, delivery_date, pere, groupe) VALUES '
   query += '('+line.id+', "'+line.product+'","'+line.manufacturer+'","'+line.beginDate+'","'+line.endDate+'",'+line.quantity+',"'+line.of+'","'+line.deliveryDate+'",'+pere+','+groupe+')'
   odbcConnector(query, function(result){
     var query2 = 'SELECT max(id) as id FROM product_sequence'
