@@ -65,7 +65,7 @@ function getDataTARDY(request, callback){
   }
 }
 
-exports.getTransfertVariable = function(){
+exports.getTransfertVariable = function(callback){
   var oldquery = "UPDATE product_sequence SET age='old'"
   var getLinesFromAPR = "select * from cdeent where codcpt like 'TARDY%' or idecli = '71'";
   var getLinesFromTARDY = "select * from tardy_scheduler.tardydata where client like 'APR' and id_of=of_pere";
@@ -86,6 +86,7 @@ exports.getTransfertVariable = function(){
                     console.log('size: '+size)
                     setProductionSequence(function(){
                       console.log('finished');
+                      callback();
                     });
                   }
                 });

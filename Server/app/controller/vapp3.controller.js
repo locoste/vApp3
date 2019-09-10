@@ -1,5 +1,5 @@
 var dateFormat = require('dateFormat');
-
+var script = require('../script/SchedulerAnalysisModel.js')
 const https = require('https');
 var http = require('http');
 var fs = require('fs');
@@ -251,6 +251,12 @@ exports.getJSONTree = function(req, res){
   })
 }
 
+exports.generateTransfertVariable = function(req, res){
+  script.getTransfertVariable(function(){
+    res.send('done')
+  });
+}
+
 
 function odbcConnector(request, callback){
   const id = {
@@ -339,38 +345,6 @@ function getDataAPR(request, callback){
   catch (err){
     callback(returnData(err));
   }
-}
-
-function generateProdJSONOld(project){
-  var query = "SELECT num, label, date, type, attribution, dependancies, comments FROM product_sequence WHERE project="+project+" ORDER BY dependancies"
-  
-  odbcConnector(query, function(result){
-    var i=0;
-    var compt=1;
-    var prod = JSON.parse('{"num":'+result[0].num+', "label":"'+result[0].label+'", "type":"'+result[0].type+'", "attribution":"'+result[0].attribution+'", "comment":"'+result[0].comments+'", "subProduct":[]}')
-    var num = result[0].num
-    var sub=[]
-    while (compt < result.length){
-      console.log(i)
-      if(result[i].dependancies==num){
-        sub.push('{"num":'+result[i].num+', "label":"'+result[i].label+'", "type":"'+result[i].type+'", "attribution":"'+result[i].attribution+'", "comment":"'+result[i].comments+'", "subProduct":[]}');
-        console.log(sub);
-        compt++;
-      }
-      if(i<result.length-1){
-        i++;
-      } else {
-        for(j=0; j<sub.length; j++){
-
-        }
-        
-        console.log(prod);
-        prod['subProduct'].push(JSON.parse(sub));
-        console.log(prod);
-        i=0;
-      }
-    }
-  })
 }
 
 function generateProdJSON(project){

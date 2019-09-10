@@ -116,5 +116,8 @@ module.exports = function(app) {
 
     // get all project information
     app.get('/getProject/:project', contSession.authrequired, controller.getProjectInformation);
+
+    // launch sequence generator
+    app.post('/generateTransfertVariable', controller.generateTransfertVariable);
 }
 
