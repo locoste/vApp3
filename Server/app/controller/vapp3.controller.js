@@ -105,24 +105,29 @@ exports.getTreantFile = function(req, res){
   switch(page){
     case 'app.js':
       path = page;
+      res.writeHead(200, {"Content-Type": "text/plain"});
       break;
     case 'Treant.css':
       path = 'treant-js/'+page;
+      res.writeHead(200, {"Content-Type": "text/css"});
       break;
     case 'conn.css':
       path = page;
+      res.writeHead(200, {"Content-Type": "text/css"});
       break;
     case 'controller.js':
       path = page;
+      res.writeHead(200, {"Content-Type": "text/plain"});
       break;
     case 'raphael.js':
       path = 'treant-js/vendor/'+page;
+      res.writeHead(200, {"Content-Type": "text/plain"});
       break;
     case 'Treant.js':
       path = 'treant-js/'+page;
+      res.writeHead(200, {"Content-Type": "text/plain"});
       break;
   }
-  res.writeHead(200, {"Content-Type": "text/plain"});
   fs.readFile('./Server/app/tree/'+path, function(err, js){
       if(err){
         throw err;
