@@ -21,6 +21,17 @@ module.exports = function(app) {
       user: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE
+<<<<<<< HEAD
+=======
+    };*/
+
+    var options = {
+      host: 'localhost', 
+      port: '3306',
+      user: 'root',
+      password: 'root',
+      database: 'vapp3'
+>>>>>>> 39feea59fbf7e742daf16d92b9b1074999e77375
     };
 
     var sessionStore = new MySQLStore(options);

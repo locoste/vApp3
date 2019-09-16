@@ -28,7 +28,7 @@ if (con == undefined){
   con = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: 'Lamoule07130',
+    password: 'root',
     database: 'tardy_scheduler'
   });
 }
