@@ -264,33 +264,33 @@ exports.generateTransfertVariable = function(req, res){
 
 
 function odbcConnector(request, callback){
-  const id = {
-        host : 'localhost',
-        path: '/api/odbcModels/requestdb?request='+escape(request),
-        port: 3000,
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      };  
-
-      const idCallback = function(response) {
-        let str = '';
-        response.on('data', function(chunk) {
-          str += chunk;
-        });
-
-        response.on('end', function(){
-          console.log(str)
-          var result = JSON.parse(str)
-          callback(result.request);
-        })
+    const id = {
+      host : odbc_url,
+      //path: '/api/odbcModels/requestdb?request='+escape(request),
+      path:'/odbcvApp3/v1/api/odbcModels/requestdb?request='+escape(request),
+      port: odbc_port,
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'rejectUnauthorized':false
       }
+    };  
 
-      console.log(id.path)
-      const idReq = http.request(id, idCallback);
-      idReq.end();
-}
+    const idCallback = function(response) {
+      let str = '';
+      response.on('data', function(chunk) {
+        str += chunk;
+      });
+
+      response.on('end', function(){
+        var result = JSON.parse(str)
+        callback(result.request);
+      })
+    }
+
+    const idReq = https.request(id, idCallback);
+    idReq.end();
+  }
 
 function schedulerConnector(art, datedem, qteDem, mo, company, callback){
   const id = {

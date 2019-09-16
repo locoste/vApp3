@@ -1,4 +1,3 @@
-
 module.exports = function(app) {
 
     var controller = require('../controller/vapp3.controller.js');
@@ -6,7 +5,7 @@ module.exports = function(app) {
     var script = require('../script/SchedulerAnalysisModel.js')
 
     var bodyParser = require('body-parser');
-    const uuid = require('uuid/v4')
+    const uuid = require('uuid/v4');
     var session = require('express-session');
     var cookieParser = require('cookie-parser');
     const passport = require('passport');
@@ -16,20 +15,12 @@ module.exports = function(app) {
 
     var fs = require('fs');
 
-    /*var options = {
+    var options = {
       host: process.env.DATABASE_HOST, 
       port: process.env.DATABASE_PORT,
       user: process.env.DATABASE_USER,
       password: process.env.DATABASE_PASSWORD,
       database: process.env.DATABASE
-    };*/
-
-    var options = {
-      host: 'localhost', 
-      port: '3306',
-      user: 'root',
-      password: 'Lamoule07130',
-      database: 'vapp3'
     };
 
     var sessionStore = new MySQLStore(options);

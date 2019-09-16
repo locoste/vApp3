@@ -6,6 +6,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 var request = require('../database/requestToDatabase.js')
 var http = require('http');
+var https = require('https');
 
 const odbc_url = process.env.ODBC_URL; 
 const odbc_port = process.env.ODBC_PORT;
@@ -14,7 +15,9 @@ passport.use(new LocalStrategy(
 	{ usernameField: 'email' },
 	(email, password, done) => {
 		var query = 'SELECT * FROM users;'	
+		console.log('before odbc')
 		odbcConnector(query, function(result){
+			console.log(result)
 			for (var i = 0; i < result.length; i++){
 				if(result[i].login==email && result[i].password==password){
 					var user = '{"id":' + result[i].user_id + ',"email":"' + result[i].email + '", "login":"' + result[i].login + '", "password":"' + result[i].password + '", "role":"'+result[i].role+'"}';
@@ -92,12 +95,14 @@ exports.logoutUser = function(req, res) {
 
 	function odbcConnector(request, callback){
 		const id = {
-			host : 'localhost',
-			path: '/api/odbcModels/requestdb?request='+escape(request),
-			port: 3000,
+			host : odbc_url,
+			//path: '/api/odbcModels/requestdb?request='+escape(request),
+			path:'/odbcvApp3/v1/api/odbcModels/requestdb?request='+escape(request),
+			port: odbc_port,
 			method: 'GET',
 			headers: {
-				'Content-Type': 'application/json'
+				'Content-Type': 'application/json',
+        		'rejectUnauthorized':false
 			}
 		};  
 
@@ -108,13 +113,11 @@ exports.logoutUser = function(req, res) {
 			});
 
 			response.on('end', function(){
-				console.log(str)
 				var result = JSON.parse(str)
 				callback(result.request);
 			})
 		}
 
-		console.log(id.path)
-		const idReq = http.request(id, idCallback);
+		const idReq = https.request(id, idCallback);
 		idReq.end();
 	}

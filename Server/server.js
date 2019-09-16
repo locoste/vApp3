@@ -2,16 +2,16 @@ var express = require('express');
 var app = express();
 var bodyParser = require('body-parser');
 app.use(bodyParser.json())
+const dotenv = require('dotenv');
+dotenv.config();
 
 require('./app/routes/vapp3.routes.js')(app);
 
+const port = process.env.PORT;
+const url = process.env.API_URL;
 // Create a Server
-var server = app.listen(8002, function () {
+var server = app.listen(port, function () {
 
-  var host = server.address().address
-  var port = server.address().port
-
-  console.log("App listening at http://%s:%s", host, port)
+  console.log("App listening at http://%s:%s", url, port)
 
 })
-
