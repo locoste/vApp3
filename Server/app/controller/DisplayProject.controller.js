@@ -22,11 +22,6 @@ app.controller('DisplayProject', function($scope, $http, config) {
     $scope.$apply();
   }
 
-
-  $http.get('http://'+url+':'+port+'/getJSONTree/'+project).then(function(response){
-    $scope.graph = response.data;
-  });
-
   $http.get('http://'+url+':'+port+'/getUserCompany').then(function(response){
     $scope.User = response.data[0].company;
   });

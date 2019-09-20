@@ -29,6 +29,7 @@ module.exports = function(lxpModel) {
 
 function getData(request, callback){
     try {
+        console.log(request)
         var pool = new sql.ConnectionPool(config);
         pool.connect().then(result => {
        var aResult = pool.request().query(request);
@@ -84,7 +85,6 @@ lxpModel.executeQuery = function(query, callback)
   getData(query, function(res){
     callback(res);
   });
-   
 }
 
 

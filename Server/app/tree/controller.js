@@ -1,22 +1,14 @@
 app.controller("CustomController", function ($scope, $http) {
 	var ctrl = {};
 	var prod = getProject();
-
-	/*$scope.nodeSelectedLast = "(NONE)";*/
-
-	ctrl.selectEvent = function (nodeId, node, event) {
-		$scope.nodeSelectedLast = nodeId;
-		$scope.$apply();
-	}
-
 	$scope.graph = {
-		chart: {
-			container: "#example-graph",
-			levelSeparation:    20,
-       		siblingSeparation:  120,
-        	subTeeSeparation:   15,
+			chart: {
+				container: "#example-graph",
+				levelSeparation:    20,
+				siblingSeparation:  120,
+				subTeeSeparation:   15,
 
-			rootOrientation: "WEST",
+				rootOrientation: "WEST",
 
 			//nodeAlign: "BOTTOM",
 
@@ -29,17 +21,111 @@ app.controller("CustomController", function ($scope, $http) {
 				nodeSpeed: 700,
 			},
 			callback: {
-        // This refers to custom callback available in https://github.com/Alexlambertz/treant-js
-        onClick: function (nodeId, node, event) {
-        	ctrl.selectEvent(nodeId, node, event);
-        }.bind(this),
-        onTreeLoaded: function () {
-        	console.log("Graph loaded!!");
-        }
-    }
-},
-nodeStructure: 
-{prod:2865,
+		        // This refers to custom callback available in https://github.com/Alexlambertz/treant-js
+		        onClick: function (nodeId, node, event) {
+		        	ctrl.selectEvent(nodeId, node, event);
+		        }.bind(this),
+		        onTreeLoaded: function () {
+		        	console.log("Graph loaded!!");
+		        }
+		    }
+		},
+		nodeStructure:{}
+	};
+
+	/*$scope.nodeSelectedLast = "(NONE)";*/
+
+	ctrl.selectEvent = function (nodeId, node, event) {
+		$scope.nodeSelectedLast = nodeId;
+		$scope.$apply();
+	}
+
+	$http.get('http://localhost:8002/getJSONTree/'+prod).then(function(response){
+		/*$scope.graph.nodeStructure = response.data;
+		console.log('graph');
+		console.log($scope.graph);*/
+		var treeStructure = {
+			chart: {
+				container: "#example-graph",
+				levelSeparation:    20,
+				siblingSeparation:  120,
+				subTeeSeparation:   15,
+
+				rootOrientation: "WEST",
+
+			//nodeAlign: "BOTTOM",
+
+			node: {
+				HTMLclass: "big-commpany",
+				/*collapsable: true*/
+			},
+			animation: {
+				nodeAnimation: "easeOutBounce",
+				nodeSpeed: 700,
+			},
+			callback: {
+		        // This refers to custom callback available in https://github.com/Alexlambertz/treant-js
+		        onClick: function (nodeId, node, event) {
+		        	ctrl.selectEvent(nodeId, node, event);
+		        }.bind(this),
+		        onTreeLoaded: function () {
+		        	console.log("Graph loaded!!");
+		        }
+		    }
+		},
+		nodeStructure:response.data
+	};
+	new Treant(treeStructure);
+	})
+			/*chart: {
+				container: "#example-graph",
+				levelSeparation:    20,
+				siblingSeparation:  120,
+				subTeeSeparation:   15,
+
+				rootOrientation: "WEST",
+
+			//nodeAlign: "BOTTOM",
+
+			node: {
+				HTMLclass: "big-commpany",
+				//collapsable: true
+			},
+			animation: {
+				nodeAnimation: "easeOutBounce",
+				nodeSpeed: 700,
+			},
+			callback: {
+		        // This refers to custom callback available in https://github.com/Alexlambertz/treant-js
+		        onClick: function (nodeId, node, event) {
+		        	ctrl.selectEvent(nodeId, node, event);
+		        }.bind(this),
+		        onTreeLoaded: function () {
+		        	console.log("Graph loaded!!");
+		        }
+		    }
+		},*/
+		/*nodeStructure: response.data
+
+	};
+	console.log($scope.graph);*/
+//})
+
+	$scope.gotClick = function (temp) {
+		console.log("aa *****");
+		console.log("temp = " + temp);
+	}
+
+	function getProject()
+	{
+		var str = window.location.search;
+		str = str.substr(1);
+		return str;
+	}
+
+});
+
+/*{prod:2865,
 	HTMLclass: "product-bot",
 	text:{
 		name:"PAVE FLUIDIQUE INFERIEUR",
@@ -95,19 +181,4 @@ children:[
 				children:[]
 		}
 	]
-}
-							};
-
-							$scope.gotClick = function (temp) {
-								console.log("aa *****");
-								console.log("temp = " + temp);
-							}
-
-							function getProject()
-							{
-								var str = window.location.search;
-								str = str.substr(1);
-								return str;
-							}
-
-						});
+}*/
