@@ -1,4 +1,4 @@
-var dateFormat = require('dateFormat');
+var dateFormat = require('dateformat');
 var script = require('../script/SchedulerAnalysisModel.js')
 const https = require('https');
 var http = require('http');
